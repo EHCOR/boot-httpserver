@@ -3,27 +3,16 @@
 > npx tsc && node dist/index.js
 
 Server is running at http://localhost:8080
-[NON-OK] GET /admin/reset - Status: 200
+[NON-OK] POST /admin/reset - Status: 200
+[NON-OK] GET /admin/reset - Status: 404
+[NON-OK] POST /admin/reset - Status: 200
 [NON-OK] GET /admin/metrics - Status: 200
 [NON-OK] GET /app - Status: 301
 [NON-OK] GET /app/ - Status: 200
 [NON-OK] GET /admin/metrics - Status: 200
-[NON-OK] GET /app - Status: 301
-[NON-OK] GET /app/ - Status: 200
-[NON-OK] GET /app - Status: 301
-[NON-OK] GET /app/ - Status: 200
-[NON-OK] GET /app - Status: 301
-[NON-OK] GET /app/ - Status: 200
+[NON-OK] GET /admin/reset - Status: 404
+[NON-OK] POST /admin/reset - Status: 200
 [NON-OK] GET /admin/metrics - Status: 200
-[NON-OK] GET /admin/reset - Status: 200
-[NON-OK] GET /admin/metrics - Status: 200
-[NON-OK] GET /app - Status: 301
-[NON-OK] GET /app/ - Status: 200
-[NON-OK] GET /admin/metrics - Status: 200
-[NON-OK] GET /app - Status: 301
-[NON-OK] GET /app/ - Status: 200
-[NON-OK] GET /app - Status: 301
-[NON-OK] GET /app/ - Status: 200
 [NON-OK] GET /app - Status: 301
 [NON-OK] GET /app/ - Status: 200
 [NON-OK] GET /admin/metrics - Status: 200

@@ -12,7 +12,32 @@ app.listen(PORT, () => {
 });
 app.get("/api/healthz", handlerReadiness);
 app.get("/admin/metrics", handlerServerHits);
-app.get("/admin/reset", handlerServerReset);
+app.post("/admin/reset", handlerServerReset);
+app.post("/api/validate_chirp", handleValidateChirp);
+function handleValidateChirp(req, res) {
+    let maxLength = 140;
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk;
+    });
+    req.on("end", () => {
+        try {
+            const data = JSON.parse(body);
+            if (data.body.length > maxLength) {
+                res.status(400).send({ error: "Chirp is too long" });
+                return;
+            }
+            else {
+                res.setHeader("Content-Type", "application/json");
+                res.status(200).json({ valid: true });
+            }
+        }
+        catch (err) {
+            res.status(400).send({ error: "Something went wrong" });
+            return;
+        }
+    });
+}
 function middlewareLogResponses(req, res, next) {
     res.on("finish", () => {
         console.log(`[NON-OK] ${req.method} ${req.originalUrl} - Status: ${res.statusCode}`);
