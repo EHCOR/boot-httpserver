@@ -11,6 +11,7 @@ const config: APIConfig = {
 
 app.use(middlewareLogResponses);
 app.use(middlewareMetricsInc);
+app.use(express.json());
 app.use("/app",express.static("./src/app"));
 
 app.listen(PORT, () => {
@@ -24,38 +25,28 @@ app.post("/api/validate_chirp", handleValidateChirp);
 
 function handleValidateChirp(req: Request, res: Response) {
   let maxLength = 140;
-  type responseDataValid = {
-    valid: boolean;
+
+  type requestData = {
+    body: string;
   }
-  type responseDataError = {
-    error: string;
-  }
+  try {
+  const data: requestData = req.body;
 
-  let body = "";
-
-  req.on("data",(chunk) => {
-    body += chunk;
-  })
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      if (data.body.length > maxLength){
-        res.status(400).send({ error: "Chirp is too long"} as responseDataError);
-        return;
-      } else {
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).json({ valid: true } as responseDataValid);
-      }
-
-    } catch (err) {
-      res.status(400).send({ error: "Something went wrong" } as responseDataError);
-      return;
+  if (data.body.length > maxLength){
+    res.status(400).send({ error: "Chirp is too long"});
+    return;
+  } else {
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json({ valid: true });
     }
-  });
 
+  } catch (err) {
+    res.status(400).send({ error: "Something went wrong"});
+    return;
+  }
 
 }
+
 
 function middlewareLogResponses(req: Request, res: Response, next: NextFunction) {
   res.on("finish", () => {
