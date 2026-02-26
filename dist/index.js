@@ -24,8 +24,18 @@ function handleValidateChirp(req, res) {
             return;
         }
         else {
+            let orgBody = data.body.split(" ");
+            let words = data.body.toLowerCase().split(" ");
+            if (words.includes("kerfuffle") || words.includes("sharbert") || words.includes("fornax")) {
+                for (let nword in words) {
+                    if (words[nword] === "kerfuffle" || words[nword] === "sharbert" || words[nword] === "fornax") {
+                        orgBody[nword] = "****";
+                    }
+                }
+            }
+            let responseBody = orgBody.join(" ");
             res.setHeader("Content-Type", "application/json");
-            res.status(200).json({ valid: true });
+            res.status(200).json({ cleanedBody: responseBody });
         }
     }
     catch (err) {
