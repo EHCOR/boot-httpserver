@@ -23,7 +23,9 @@ app.get("/admin/metrics", handlerServerHits);
 app.post("/admin/reset", handlerServerReset);
 app.post("/api/validate_chirp", handleValidateChirp);
 
-function handleValidateChirp(req: Request, res: Response) {
+app.use(middlewareErrorHandler);
+
+function handleValidateChirp(req: Request, res: Response, next: NextFunction) {
   let maxLength = 140;
 
   type requestData = {
@@ -33,8 +35,9 @@ function handleValidateChirp(req: Request, res: Response) {
   const data: requestData = req.body;
 
   if (data.body.length > maxLength){
-    res.status(400).send({ error: "Chirp is too long"});
-    return;
+    // res.status(400).send({ error: "Chirp is too long"});
+    // return;
+    next(new Error("Chirp is too long"));
   } else {
     let orgBody = data.body.split(" ");
     let words = data.body.toLowerCase().split(" ");
@@ -51,12 +54,15 @@ function handleValidateChirp(req: Request, res: Response) {
     }
 
   } catch (err) {
-    res.status(400).send({ error: "Something went wrong"});
-    return;
+    next(err);
   }
 
 }
 
+function middlewareErrorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+  console.log(err);
+  res.status(500).json({ "error": "Something went wrong on our end"});
+}
 
 function middlewareLogResponses(req: Request, res: Response, next: NextFunction) {
   res.on("finish", () => {
