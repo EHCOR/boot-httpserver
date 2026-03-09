@@ -23,7 +23,7 @@ function handleValidateChirp(req, res, next) {
         if (data.body.length > maxLength) {
             // res.status(400).send({ error: "Chirp is too long"});
             // return;
-            next(new Error("Chirp is too long"));
+            next(new BadRequestError("Chirp is too long. Max length is 140"));
         }
         else {
             let orgBody = data.body.split(" ");
@@ -46,7 +46,21 @@ function handleValidateChirp(req, res, next) {
 }
 function middlewareErrorHandler(err, req, res, next) {
     console.log(err);
-    res.status(500).json({ "error": "Something went wrong on our end" });
+    if (err instanceof BadRequestError) {
+        res.status(400).json({ "error": err.message });
+    }
+    else if (err instanceof UnauthorizedError) {
+        res.status(401).json({ "error": err.message });
+    }
+    else if (err instanceof ForbiddenError) {
+        res.status(403).json({ "error": err.message });
+    }
+    else if (err instanceof NotFoundError) {
+        res.status(404).json({ "error": err.message });
+    }
+    else {
+        res.status(500).json({ "error": "Something went wrong on our end" });
+    }
 }
 function middlewareLogResponses(req, res, next) {
     res.on("finish", () => {
@@ -78,4 +92,24 @@ function handlerServerReset(req, res) {
     config.fileserverHits = 0;
     res.setHeader("Content-Type", "text/plain");
     res.status(200).send("OK");
+}
+class BadRequestError extends Error {
+    constructor(message) {
+        super(message);
+    }
+}
+class UnauthorizedError extends Error {
+    constructor(message) {
+        super(message);
+    }
+}
+class ForbiddenError extends Error {
+    constructor(message) {
+        super(message);
+    }
+}
+class NotFoundError extends Error {
+    constructor(message) {
+        super(message);
+    }
 }
