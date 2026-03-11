@@ -5,6 +5,16 @@ import { handleValidateChirp } from "./handlers/chirps";
 import { middlewareLogResponses } from "./middleware/logResponses";
 import { middlewareMetricsInc } from "./middleware/metricsInc";
 import { middlewareErrorHandler } from "./middleware/errorHandler";
+import postgres from "postgres";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { config } from "./config";
+
+process.loadEnvFile();
+
+const migrationClient = postgres(config.db.url, { max: 1 });
+await migrate(drizzle(migrationClient), config.db.migrationConfig);
+
 
 const app = express();
 const PORT = 8080;

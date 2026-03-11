@@ -5,6 +5,7 @@ import { handleValidateChirp } from "./handlers/chirps";
 import { middlewareLogResponses } from "./middleware/logResponses";
 import { middlewareMetricsInc } from "./middleware/metricsInc";
 import { middlewareErrorHandler } from "./middleware/errorHandler";
+process.loadEnvFile();
 const app = express();
 const PORT = 8080;
 app.use(middlewareLogResponses);

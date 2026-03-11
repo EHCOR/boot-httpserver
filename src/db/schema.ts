@@ -1,6 +1,6 @@
 import { pgTable, timestamp, varchar, uuid } from "drizzle-orm/pg-core";
 
-export const userss = pgTable("users", {
+export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").
@@ -9,4 +9,4 @@ export const userss = pgTable("users", {
     }
 );
 
-export type NewUser = typeof userss.$inferInsert;
+export type NewUser = typeof users.$inferInsert;
