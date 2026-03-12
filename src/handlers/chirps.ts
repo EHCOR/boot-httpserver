@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { BadRequestError } from "../errors/http";
+import { BadRequestError } from "../errors/http.js";
 
 type ValidateChirpRequestBody = {
   body: string;

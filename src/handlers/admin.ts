@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { config } from "../config";
+import { config } from "../config.js";
+import { deleteAllUsers } from "../db/queries/users.js";
 
 export function handlerServerHits(req: Request, res: Response) {
   res.setHeader("Content-Type", "text/html");
@@ -12,7 +13,12 @@ export function handlerServerHits(req: Request, res: Response) {
 }
 
 export function handlerServerReset(req: Request, res: Response) {
+  if (!(config.platform === "dev")) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
   config.fileserverHits = 0;
+  deleteAllUsers();
   res.setHeader("Content-Type", "text/plain");
   res.status(200).send("OK");
 }

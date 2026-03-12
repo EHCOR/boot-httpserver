@@ -4,7 +4,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../errors/http";
+} from "../errors/http.js";
 
 export function middlewareErrorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   console.log(err);
