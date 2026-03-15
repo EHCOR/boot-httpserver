@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../errors/http.js";
+import { createChirp } from "../db/queries/chirps.js";
 
 type ValidateChirpRequestBody = {
   body: string;
@@ -8,7 +9,7 @@ type ValidateChirpRequestBody = {
 const bannedWords = ["kerfuffle", "sharbert", "fornax"];
 const maxLength = 140;
 
-export function handleValidateChirp(req: Request, res: Response, next: NextFunction) {
+export async function addChirp(req: Request, res: Response, next: NextFunction) {
   try {
     const data: ValidateChirpRequestBody = req.body;
 
@@ -26,9 +27,11 @@ export function handleValidateChirp(req: Request, res: Response, next: NextFunct
       }
     }
 
-    const responseBody = originalBody.join(" ");
+    const userId = req.body.userId;
+    const result = await createChirp({ body: originalBody.join(" "), userId });
+    
     res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ cleanedBody: responseBody });
+    res.status(201).json(result);
   } catch (err) {
     next(err);
   }
