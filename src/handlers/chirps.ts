@@ -9,7 +9,7 @@ type ValidateChirpRequestBody = {
 const bannedWords = ["kerfuffle", "sharbert", "fornax"];
 const maxLength = 140;
 
-export async function addChirp(req: Request, res: Response, next: NextFunction) {
+export async function handlerAddChirp(req: Request, res: Response, next: NextFunction) {
   try {
     const data: ValidateChirpRequestBody = req.body;
 
@@ -35,4 +35,8 @@ export async function addChirp(req: Request, res: Response, next: NextFunction) 
   } catch (err) {
     next(err);
   }
+}
+
+export async function handlerGetAllChirps(req: Request, res: Response, next: NextFunction) {
+
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { createUser } from "../db/queries/users.js";
 
-export async function handleCreateUser(req: Request, res: Response) {
+export async function handlerCreateUser(req: Request, res: Response) {
   try {
     const { email } = req.body;
 
