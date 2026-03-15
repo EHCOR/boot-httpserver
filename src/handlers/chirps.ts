@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../errors/http.js";
-import { createChirp } from "../db/queries/chirps.js";
+import { createChirp, getAllChirps } from "../db/queries/chirps.js";
 
 type ValidateChirpRequestBody = {
   body: string;
@@ -38,5 +38,11 @@ export async function handlerAddChirp(req: Request, res: Response, next: NextFun
 }
 
 export async function handlerGetAllChirps(req: Request, res: Response, next: NextFunction) {
-
+  try {
+    const result = await getAllChirps();
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
 }
