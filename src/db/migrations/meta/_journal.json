@@ -15,6 +15,13 @@
       "when": 1773593422625,
       "tag": "0001_late_trish_tilby",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773596752752,
+      "tag": "0002_sharp_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }
