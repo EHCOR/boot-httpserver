@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequestError } from "../errors/http.js";
 import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { validateJWT, getBearerToken } from "../middleware/auth.js";
+import { config } from "../config.js";
 
 type ValidateChirpRequestBody = {
   body: string;
@@ -11,6 +13,8 @@ const maxLength = 140;
 
 export async function handlerAddChirp(req: Request, res: Response, next: NextFunction) {
   try {
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.jwtSecret);
     const data: ValidateChirpRequestBody = req.body;
 
     if (data.body.length > maxLength) {
@@ -26,8 +30,6 @@ export async function handlerAddChirp(req: Request, res: Response, next: NextFun
         originalBody[index] = "****";
       }
     }
-
-    const userId = req.body.userId;
     const result = await createChirp({ body: originalBody.join(" "), userId });
     
     res.setHeader("Content-Type", "application/json");

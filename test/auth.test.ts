@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import {makeJWT, validateJWT, hashPassword, checkPasswordHash} from "../src/middleware/auth.js";
+import {makeJWT, validateJWT, hashPassword, checkPasswordHash, getBearerToken} from "../src/middleware/auth.js";
 
 describe("Password Hashing", () => {
   const password1 = "correctPassword123!";
@@ -40,5 +40,29 @@ describe("JWT", () => {
 
   it("should throw for a malformed token", () => {
     expect(() => validateJWT("not.a.valid.token", secret)).toThrow("Invalid token");
+  });
+});
+
+describe("Bearer Token Extraction", () => {
+  it("should extract the token from a valid Authorization header", () => {
+    const req = {
+      get: (header: string) => header === "Authorization" ? "Bearer valid-token" : undefined
+    } as any;
+    const token = getBearerToken(req);
+    expect(token).toBe("valid-token");
+  });
+
+  it("should throw if the Authorization header is missing", () => {
+    const req = {
+      get: (header: string) => undefined
+    } as any;
+    expect(() => getBearerToken(req)).toThrow("No Authorization header");
+  });
+
+  it("should throw if the Authorization header is malformed", () => {
+    const req = {
+        get: (header: string) => header === "Authorization" ? "InvalidHeaderFormat" : undefined
+    } as any;
+    expect(() => getBearerToken(req)).toThrow("Invalid Authorization header format");
   });
 });

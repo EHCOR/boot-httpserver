@@ -21,8 +21,9 @@ const dbConfig: DBConfig = {
   migrationConfig: migrationConfig,
 };
 
-export const config: APIConfig & { db: DBConfig } = {
+export const config: APIConfig & { db: DBConfig; jwtSecret: string } = {
   db: dbConfig,
   fileserverHits: 0,
   platform: process.env.PLATFORM || '',
+  jwtSecret: process.env.JWT_SECRET || '',
 };
