@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { NotFoundError } from "../errors/http.js";
-import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { ForbiddenError, NotFoundError } from "../errors/http.js";
+import { createChirp, deleteChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
 import { validateJWT, getBearerToken } from "../auth.js";
 import { config } from "../config.js";
 import { createChirpSchema, parseBody } from "../validation.js";
@@ -47,6 +47,25 @@ export async function handlerGetChirpById(req: Request, res: Response, next: Nex
     }
 
     res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function handlerDeleteChirp(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.jwtSecret);
+    const { chirpId } = req.params;
+    const chirp = await getChirpById(String(chirpId));
+    if (!chirp) {
+      throw new NotFoundError("Chirp not found");
+    }
+    if (chirp.userId !== userId) {
+      throw new ForbiddenError("You are not the author of this chirp");
+    }
+    await deleteChirp(String(chirpId));
+    res.status(204).send();
   } catch (err) {
     next(err);
   }
