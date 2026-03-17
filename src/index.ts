@@ -13,6 +13,7 @@ import { handlerCreateUser, handlerLoginUser, handlerRefreshToken, handlerRevoke
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
+await migrationClient.end();
 
 
 const app = express();

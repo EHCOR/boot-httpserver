@@ -12,6 +12,7 @@ import { handlerAddChirp, handlerGetAllChirps, handlerGetChirpById } from "./han
 import { handlerCreateUser, handlerLoginUser, handlerRefreshToken, handlerRevokeToken } from "./handlers/users.js";
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
+await migrationClient.end();
 const app = express();
 const PORT = 8080;
 app.use(middlewareLogResponses);

@@ -2,14 +2,17 @@ import type { MigrationConfig } from "drizzle-orm/migrator";
 
 process.loadEnvFile();
 
-export type APIConfig = {
-  fileserverHits: number;
-  platform: string;
-};
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
 
 export type DBConfig = {
-  url: string;
-  migrationConfig: MigrationConfig;
+  readonly url: string;
+  readonly migrationConfig: MigrationConfig;
 };
 
 const migrationConfig: MigrationConfig = {
@@ -17,13 +20,12 @@ const migrationConfig: MigrationConfig = {
 };
 
 const dbConfig: DBConfig = {
-  url: process.env.DB_URL || '',
+  url: requireEnv("DB_URL"),
   migrationConfig: migrationConfig,
 };
 
-export const config: APIConfig & { db: DBConfig; jwtSecret: string } = {
+export const config = {
   db: dbConfig,
-  fileserverHits: 0,
-  platform: process.env.PLATFORM || '',
-  jwtSecret: process.env.JWT_SECRET || '',
-};
+  platform: requireEnv("PLATFORM"),
+  jwtSecret: requireEnv("JWT_SECRET"),
+} as const;

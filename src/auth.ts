@@ -1,9 +1,11 @@
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { Request } from "express";
 import crypto from "crypto";
-import { UnauthorizedError } from "../errors/http.js";
+import { Request } from "express";
+import { UnauthorizedError } from "./errors/http.js";
+
+export const JWT_EXPIRY_SECONDS = 3600; // 1 hour
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -33,8 +35,17 @@ export function validateJWT(token: string, secret: string): string {
     }
     return decoded.sub;
   } catch (err) {
-    throw new UnauthorizedError("Invalid token");
+    if (err instanceof UnauthorizedError) throw err;
+    if (err instanceof jwt.JsonWebTokenError || err instanceof jwt.TokenExpiredError) {
+      throw new UnauthorizedError("Invalid token");
+    }
+    throw err;
   }
+}
+
+export function makeRefreshToken(): string {
+    const randomBytes = crypto.randomBytes(32).toString("hex");
+    return randomBytes;
 }
 
 export function getBearerToken(req: Request): string {
@@ -47,9 +58,4 @@ export function getBearerToken(req: Request): string {
         throw new UnauthorizedError("Invalid Authorization header format");
     }
     return parts[1];
-}
-
-export function makeRefreshToken(): string {
-    const randomBytes = crypto.randomBytes(32).toString("hex");
-    return randomBytes;
 }

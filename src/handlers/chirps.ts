@@ -1,29 +1,20 @@
 import { NextFunction, Request, Response } from "express";
-import { BadRequestError } from "../errors/http.js";
+import { NotFoundError } from "../errors/http.js";
 import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
-import { validateJWT, getBearerToken } from "../middleware/auth.js";
+import { validateJWT, getBearerToken } from "../auth.js";
 import { config } from "../config.js";
-
-type ValidateChirpRequestBody = {
-  body: string;
-};
+import { createChirpSchema, parseBody } from "../validation.js";
 
 const bannedWords = ["kerfuffle", "sharbert", "fornax"];
-const maxLength = 140;
 
 export async function handlerAddChirp(req: Request, res: Response, next: NextFunction) {
   try {
     const token = getBearerToken(req);
     const userId = validateJWT(token, config.jwtSecret);
-    const data: ValidateChirpRequestBody = req.body;
+    const parsed = parseBody(createChirpSchema, req.body);
 
-    if (data.body.length > maxLength) {
-      next(new BadRequestError("Chirp is too long. Max length is 140"));
-      return;
-    }
-
-    const originalBody = data.body.split(" ");
-    const words = data.body.toLowerCase().split(" ");
+    const originalBody = parsed.body.split(" ");
+    const words = parsed.body.toLowerCase().split(" ");
 
     for (const [index, word] of words.entries()) {
       if (bannedWords.includes(word)) {
@@ -31,8 +22,6 @@ export async function handlerAddChirp(req: Request, res: Response, next: NextFun
       }
     }
     const result = await createChirp({ body: originalBody.join(" "), userId });
-    
-    res.setHeader("Content-Type", "application/json");
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -42,7 +31,6 @@ export async function handlerAddChirp(req: Request, res: Response, next: NextFun
 export async function handlerGetAllChirps(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await getAllChirps();
-    res.setHeader("Content-Type", "application/json");
     res.status(200).json(result);
   } catch (err) {
     next(err);
@@ -55,11 +43,9 @@ export async function handlerGetChirpById(req: Request, res: Response, next: Nex
     const result = await getChirpById(String(chirpId));
 
     if (!result) {
-      res.status(404).json({ error: "Chirp not found" });
-      return;
+      throw new NotFoundError("Chirp not found");
     }
 
-    res.setHeader("Content-Type", "application/json");
     res.status(200).json(result);
   } catch (err) {
     next(err);

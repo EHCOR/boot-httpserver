@@ -7,7 +7,7 @@ import {
 } from "../errors/http.js";
 
 export function middlewareErrorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
-  console.log(err);
+  console.error(err);
 
   if (err instanceof BadRequestError) {
     res.status(400).json({ error: err.message });
