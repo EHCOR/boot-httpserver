@@ -10,6 +10,7 @@ import { middlewareErrorHandler } from "./middleware/errorHandler.js";
 import { handlerServerHits, handlerServerReset } from "./handlers/admin.js";
 import { handlerAddChirp, handlerDeleteChirp, handlerGetAllChirps, handlerGetChirpById } from "./handlers/chirps.js";
 import { handlerCreateUser, handlerLoginUser, handlerRefreshToken, handlerRevokeToken, handlerUpdateUser } from "./handlers/users.js";
+import { handlerPolkaUserUpgradeEvent } from "./handlers/webhooks.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -38,6 +39,7 @@ app.post("/api/users", handlerCreateUser);
 app.post("/api/login", handlerLoginUser);
 app.post("/api/refresh", handlerRefreshToken);
 app.post("/api/revoke", handlerRevokeToken);
+app.post("/api/polka/webhooks/", handlerPolkaUserUpgradeEvent);
 app.put("/api/users", handlerUpdateUser);
 app.delete("/api/chirps/:chirpId", handlerDeleteChirp);
 app.use(middlewareErrorHandler);
