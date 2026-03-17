@@ -1,9 +1,15 @@
-import { NotFoundError } from "../errors/http.js";
+import { NotFoundError, UnauthorizedError } from "../errors/http.js";
 import { getUserById, upgradeUserToChirpyRed } from "../db/queries/users.js";
 import { NextFunction, Request, Response } from "express";
+import { getAPIKey } from "../auth.js";
+import { config } from "../config.js";
 
 export async function handlerPolkaUserUpgradeEvent(req: Request, res: Response, next: NextFunction) {
     try {
+        const apiKey = getAPIKey(req);
+        if (apiKey !== config.polkaKey) {
+            throw new UnauthorizedError("Invalid API key");
+        }
         const event = req.body.event;
         if (event !== "user.upgraded") {
             return res.status(204).send();

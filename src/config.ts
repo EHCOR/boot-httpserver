@@ -28,4 +28,5 @@ export const config = {
   db: dbConfig,
   platform: requireEnv("PLATFORM"),
   jwtSecret: requireEnv("JWT_SECRET"),
+  polkaKey: requireEnv("POLKA_KEY"),
 } as const;

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import {makeJWT, validateJWT, hashPassword, checkPasswordHash, getBearerToken} from "../src/auth.js";
+import {makeJWT, validateJWT, hashPassword, checkPasswordHash, getBearerToken, getAPIKey} from "../src/auth.js";
 
 describe("Password Hashing", () => {
   const password1 = "correctPassword123!";
@@ -64,5 +64,29 @@ describe("Bearer Token Extraction", () => {
         get: (header: string) => header === "Authorization" ? "InvalidHeaderFormat" : undefined
     } as any;
     expect(() => getBearerToken(req)).toThrow("Invalid Authorization header format");
+  });
+});
+
+describe("API Key Extraction", () => {
+  it("should extract the API key from a valid Authorization header", () => {
+    const req = {
+      get: (header: string) => header === "Authorization" ? "ApiKey valid-api-key" : undefined
+    } as any;
+    const apiKey = getAPIKey(req);
+    expect(apiKey).toBe("valid-api-key");
+  });
+
+  it("should throw if the Authorization header is missing", () => {
+    const req = {
+      get: (header: string) => undefined
+    } as any;
+    expect(() => getAPIKey(req)).toThrow("No Authorization header");
+  });
+
+  it("should throw if the Authorization header is malformed", () => {
+    const req = {
+        get: (header: string) => header === "Authorization" ? "InvalidHeaderFormat" : undefined
+    } as any;
+    expect(() => getAPIKey(req)).toThrow("Invalid Authorization header format");
   });
 });
