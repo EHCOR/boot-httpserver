@@ -30,6 +30,11 @@ export async function handlerAddChirp(req: Request, res: Response, next: NextFun
 
 export async function handlerGetAllChirps(req: Request, res: Response, next: NextFunction) {
   try {
+    const authorId = req.query.authorId as string | undefined;
+    if (authorId) {
+      const result = await getAllChirps({ userId: authorId });
+      return res.status(200).json(result);
+    }
     const result = await getAllChirps();
     res.status(200).json(result);
   } catch (err) {

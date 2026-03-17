@@ -14,11 +14,17 @@ export async function deleteAllChirps() {
     await db.delete(chirps);
 }
 
-export async function getAllChirps() {
-    return await db
+export async function getAllChirps(filter?: { userId?: string }) {
+    const query = db
     .select()
     .from(chirps)
     .orderBy(asc(chirps.createdAt));
+
+    if (filter?.userId) {
+        query.where(eq(chirps.userId, filter.userId));
+    }
+
+    return await query;
 }
 
 export async function getChirpById(id: string) {
