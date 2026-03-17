@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { createUser, getUserByEmail } from "../db/queries/users.js";
+import { createUser, getUserByEmail, updateUser } from "../db/queries/users.js";
 import { createRefreshToken, getRefreshToken, revokeRefreshToken } from "../db/queries/refreshTokens.js";
-import { checkPasswordHash, hashPassword, makeJWT, makeRefreshToken, JWT_EXPIRY_SECONDS, getBearerToken } from "../auth.js";
+import { checkPasswordHash, hashPassword, makeJWT, makeRefreshToken, JWT_EXPIRY_SECONDS, getBearerToken, validateJWT } from "../auth.js";
 import { users } from "../db/schema.js";
 import { config } from "../config.js";
-import { createUserSchema, loginUserSchema, parseBody } from "../validation.js";
+import { createUserSchema, loginUserSchema, updateUserSchema, parseBody } from "../validation.js";
 import { UnauthorizedError } from "../errors/http.js";
 
 type User = typeof users.$inferSelect;
@@ -54,6 +54,20 @@ export async function handlerRevokeToken(req: Request, res: Response, next: Next
     }
     await revokeRefreshToken(refreshToken);
     res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function handlerUpdateUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.jwtSecret);
+    const parsed = parseBody(updateUserSchema, req.body);
+    const hashedPassword = await hashPassword(parsed.password);
+    const result = await updateUser(userId, parsed.email, hashedPassword);
+    const { hashed_password, ...safeUser } = result;
+    res.status(200).json(safeUser satisfies SafeUser);
   } catch (err) {
     next(err);
   }

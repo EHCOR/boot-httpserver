@@ -11,6 +11,7 @@ export const createUserSchema = z.object({
 });
 
 export const loginUserSchema = createUserSchema;
+export const updateUserSchema = createUserSchema;
 
 export function parseBody<T>(schema: z.ZodType<T>, data: unknown): T {
   const result = schema.safeParse(data);
