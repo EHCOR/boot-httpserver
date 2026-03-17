@@ -31,11 +31,14 @@ export async function handlerAddChirp(req: Request, res: Response, next: NextFun
 export async function handlerGetAllChirps(req: Request, res: Response, next: NextFunction) {
   try {
     const authorId = req.query.authorId as string | undefined;
+    const sortOrder = req.query.sort as "asc" | "desc" | undefined;
+    sortOrder ? sortOrder : "asc";
+
     if (authorId) {
-      const result = await getAllChirps({ userId: authorId });
+      const result = await getAllChirps({ userId: authorId, sortOrder });
       return res.status(200).json(result);
     }
-    const result = await getAllChirps();
+    const result = await getAllChirps({sortOrder});
     res.status(200).json(result);
   } catch (err) {
     next(err);
